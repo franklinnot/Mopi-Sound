@@ -6,8 +6,11 @@ import asyncio
 
 
 async def get_file(url: str) -> InfoProcess:
+    folder = "downloads"
+    os.makedirs(folder, exist_ok=True)
+
     folder_name = str(uuid.uuid4())  # nombre del folder
-    folder_path = os.path.join("downloads", folder_name)  # dentro de 'downloads'
+    folder_path = os.path.join(folder, folder_name)  # dentro de 'downloads'
     os.makedirs(folder_path, exist_ok=True)  # creamos
 
     info_process = await verify_duration(url)
