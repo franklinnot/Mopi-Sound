@@ -1,66 +1,125 @@
-import { useState } from 'react';
-import { FiArrowRight } from 'react-icons/fi';
+import { useState } from "react";
+import { FiArrowRight } from "react-icons/fi";
+
+function Logo({ width = "100%", height = "auto" }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 1088 686"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g filter="url(#filter0_d_12_48)">
+        <path
+          d="M1084 645.697C1084 418.695 752.442 191.692 543.999 191.692C335.557 191.692 4 413.65 4 645.697C4 852.335 335.557 2.00264e-05 543.999 2.00264e-05C752.442 2.00264e-05 1084 852.335 1084 645.697Z"
+          fill="#FAFAFA"
+          className="mix-blend-mode:hard-light"
+          shape-rendering="geometricPrecision"
+        />
+      </g>
+      <defs>
+        <filter
+          id="filter0_d_12_48"
+          x="0"
+          y="0"
+          width="1088"
+          height="686"
+          filterUnits="userSpaceOnUse"
+          color-interpolation-filters="sRGB"
+        >
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="4" />
+          <feGaussianBlur stdDeviation="2" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_12_48"
+          />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect1_dropShadow_12_48"
+            result="shape"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
 
 function App() {
-  const [link, setLink] = useState('');
-  const [title, setTitle] = useState('');
+  const [data, setData] = useState({
+    link: "",
+    title: "",
+  });
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center text-white px-4 bg-[#111111]">
-      <div className="w-full max-w-xl flex flex-col items-center space-y-8">
+    <main className="min-h-dvh grid place-items-center pb-16 max-sm:px-8">
+      <form className="w-full max-w-xl flex flex-col items-center gap-8">
+        {/* Logo */}
+        <div className="mb-6">
+          <Logo width="224px" />
+        </div>
 
-        <img src="/icon.svg" alt="Logo grande" className="w-[210px] drop-shadow-sm mt-5 mb-16" />
-
-        <div className="flex items-center space-x-2 self-start ml-1">
-          <img src="/icon.svg" alt="Logo pequeño" className="w-10 drop-shadow-sm" />
-          <h3 className="text-base font-semibold tracking-wide text-white">
-            MOPI - Music Downloader
+        {/* Título */}
+        <div className="flex gap-2 self-start">
+          <Logo width="40px" />
+          <h3 className="text-base font-semibold tracking-wide">
+            Tu Música, Gratis
           </h3>
         </div>
 
         {/* Input: Link */}
-        <div className="w-full flex flex-col gap-1">
-          <label htmlFor="link" className="text-xs font-medium">Link</label>
+        <div id="input_div">
+          <label htmlFor="link">Link</label>
           <div className="flex gap-1.5">
             <input
               id="link"
-              type="text"
               placeholder="https://www.youtube.com/..."
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
-              className="flex-grow px-3 py-2.5 rounded-md bg-[#1F2937] text-white placeholder-gray-400 placeholder:font-medium outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
+              value={data.link}
+              onChange={(e) => setData({ ...data, link: e.target.value })}
+              className="flex-grow"
             />
-            <button
-              type="button"
-              className="bg-white px-3 rounded-md hover:bg-gray-200 transition flex items-center justify-center cursor-pointer"
-            >
-              <FiArrowRight className="w-5 h-5 text-black" />
+            <button type="button" className="px-3 grid place-items-center">
+              <FiArrowRight className="size-5" />
             </button>
           </div>
         </div>
 
         {/* Input: Título */}
-        <div className="w-full flex flex-col gap-1">
-          <label htmlFor="title" className="text-xs font-medium">Title</label>
+        <div id="input_div">
+          <label htmlFor="title">Título</label>
           <input
             id="title"
-            type="text"
-            placeholder="Song title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-md bg-[#1F2937] text-white placeholder-gray-400 placeholder:font-medium outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
+            placeholder="Lipps Inc. - Funkytown"
+            value={data.title}
+            onChange={(e) => setData({ ...data, title: e.target.value })}
+            className="w-full"
           />
         </div>
 
         {/* Botón final */}
         <button
-          type="button"
-          className="w-full py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition cursor-pointer text-xs"
+          type="submit"
+          className="w-full mt-0.5 py-2 rounded-md border-none
+                    outline-none bg-white transition"
         >
-          Continue to Download
+          Descargar
         </button>
-      </div>
-    </div>
+      </form>
+    </main>
   );
 }
 
