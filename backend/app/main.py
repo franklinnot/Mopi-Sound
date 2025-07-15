@@ -1,47 +1,45 @@
-import yt_dlp
+# main.py
+from fastapi import FastAPI, BackgroundTasks
+from fastapi.responses import FileResponse, JSONResponse
+from .worker import get_file
+from .classes import Video
+import os
+import shutil
 
-URLS = ["https://youtu.be/wdzNP7t3nZs?list=PLkcEwGUGBv8sQ2k8lNymrrxIWtSabntb8"]
-
-
-class MyLogger:
-    def debug(self, msg):
-        if msg.startswith("[debug] "):
-            pass
-        else:
-            self.info(msg)
-
-    def info(self, msg):
-        pass
-
-    def warning(self, msg):
-        pass
-
-    def error(self, msg):
-        print(msg)
+app = FastAPI()
 
 
-def my_hook(d):
-    if d["status"] == "finished":
-        print("Descarga finalizada, postprocesando...")
-    elif d["status"] == "error":
-        print("Hubo un error en la descarga...")
+@app.post("/download/")
+async def download(video: Video):
+    result = await get_file(video.url)
 
+    if not result.error:
+        file_path = result.file_path
+        title = result.title
 
-ydl_opts = {
-    "logger": MyLogger(),
-    "progress_hooks": [my_hook],
-    "format": "bestaudio/best",  # la mejor pista de audio
-    # extraer el audio y convertirlo a mp3
-    "postprocessors": [
-        {
-            "key": "FFmpegExtractAudio",  # se usa ffmpeg
-            "preferredcodec": "mp3",
-            "preferredquality": "256",  # bitrate recomendado
-        }
-    ],
-    # template para el nombre y ubicacion
-    "outtmpl": "%(title)s.%(ext)s",
-}
+        # funcion de limpieza
+        async def cleanup():
+            folder_path = os.path.dirname(file_path)
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
 
-with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    error_code = ydl.download(URLS)
+        # funcin de limpieza en bg
+        background_tasks = BackgroundTasks()
+        background_tasks.add_task(cleanup)
+
+        response = FileResponse(
+            path=file_path,
+            media_type="audio/mpeg",  # tipo MIME
+            filename=f"{title}.mp3",  # nombre del archivo
+            headers={"X-Video-Title": title},
+            background=background_tasks,
+        )
+
+        return response
+    else:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "message": result.message,
+            },
+        )
