@@ -1,4 +1,4 @@
-import { useRef, useState, forwardRef } from "react";
+import { useRef, useState, forwardRef, useEffect } from "react";
 import { FiArrowRight } from "react-icons/fi";
 
 const Logo = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(function Logo(
@@ -66,35 +66,52 @@ const Logo = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(function L
 });
 
 function App() {
-  const [data, setData] = useState({
-    link: "",
-    title: "",
-  });
+  const [data, setData] = useState({ link: "", title: "" });
   const [showDetails, setShowDetails] = useState(false);
+  const [inputActive, setInputActive] = useState(false);
+  const [hoverActive, setHoverActive] = useState(false);
+
   const logoRef = useRef<SVGSVGElement>(null);
+  const logoContainerRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
     if (data.link.trim()) {
       setShowDetails(true);
-
-      if (logoRef.current) {
-        logoRef.current.classList.add("glow-once");
-        setTimeout(() => {
-          logoRef.current?.classList.remove("glow-once");
-        }, 1000);
-      }
+      logoRef.current?.classList.add("glow-once");
+      setTimeout(() => logoRef.current?.classList.remove("glow-once"), 1000);
     }
   };
+
+  useEffect(() => {
+    const button = document.querySelector("#arrow-button");
+
+    setInputActive(data.link.trim() !== "");
+
+    const handleHoverIn = () => setHoverActive(true);
+    const handleHoverOut = () => setHoverActive(false);
+
+    button?.addEventListener("mouseenter", handleHoverIn);
+    button?.addEventListener("mouseleave", handleHoverOut);
+
+    return () => {
+      button?.removeEventListener("mouseenter", handleHoverIn);
+      button?.removeEventListener("mouseleave", handleHoverOut);
+    };
+  }, [data.link]);
 
   return (
     <main className="min-h-dvh flex justify-center pb-16 pt-12 max-sm:px-8">
       <form className="w-full max-w-xl flex flex-col items-center gap-8">
-        {/* Logo */}
-        <div className="mb-4">
+        <div
+          className={`logo-container relative mb-4 
+            ${inputActive ? "input-active" : ""} 
+            ${hoverActive ? "hover-active" : ""}
+          `}
+          ref={logoContainerRef}
+        >
           <Logo width="224px" className="hover-glow" ref={logoRef} />
         </div>
 
-        {/* Título */}
         <div className="flex gap-2 self-start">
           <Logo width="40px" />
           <h3 className="text-base font-semibold tracking-wide">
@@ -102,7 +119,6 @@ function App() {
           </h3>
         </div>
 
-        {/* Input: Link */}
         <div id="input_div" className="w-full">
           <label htmlFor="link">Link</label>
           <div className="flex gap-1.5">
@@ -114,6 +130,7 @@ function App() {
               className="flex-grow"
             />
             <button
+              id="arrow-button"
               type="button"
               onClick={handleNext}
               className="px-3 grid place-items-center"
@@ -125,7 +142,6 @@ function App() {
 
         {showDetails && (
           <div className="w-full animate-fade-in flex flex-col gap-6">
-            {/* Input: Titulo */}
             <div id="input_div">
               <label htmlFor="title">Título</label>
               <input
@@ -138,14 +154,12 @@ function App() {
 
             <button
               type="submit"
-              className="w-full mt-0.5 py-2 rounded-md border-none
-                 outline-none bg-white transition"
+              className="w-full mt-0.5 py-2 rounded-md border-none outline-none bg-white transition"
             >
               Descargar
             </button>
           </div>
         )}
-
       </form>
     </main>
   );
