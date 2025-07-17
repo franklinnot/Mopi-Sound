@@ -1,166 +1,77 @@
-import { useRef, useState, forwardRef, useEffect } from "react";
-import { FiArrowRight } from "react-icons/fi";
-
-const Logo = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(function Logo(
-  { width = "100%", height = "auto", className, ...props },
-  ref
-) {
-  return (
-    <svg
-      ref={ref}
-      width={width}
-      height={height}
-      viewBox="0 0 1088 686"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      {...props}
-    >
-      <g filter="url(#filter0_d_12_48)">
-        <path
-          d="M1084 645.697C1084 418.695 752.442 191.692 543.999 191.692C335.557 191.692 4 413.65 4 645.697C4 852.335 335.557 2.00264e-05 543.999 2.00264e-05C752.442 2.00264e-05 1084 852.335 1084 645.697Z"
-          fill="#FAFAFA"
-          className="mix-blend-mode:hard-light"
-          shapeRendering="geometricPrecision"
-        />
-      </g>
-      <defs>
-        <filter
-          id="filter0_d_12_48"
-          x="0"
-          y="0"
-          width="1088"
-          height="686"
-          filterUnits="userSpaceOnUse"
-          colorInterpolationFilters="sRGB"
-        >
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feColorMatrix
-            in="SourceAlpha"
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-            result="hardAlpha"
-          />
-          <feOffset dy="4" />
-          <feGaussianBlur stdDeviation="2" />
-          <feComposite in2="hardAlpha" operator="out" />
-          <feColorMatrix
-            type="matrix"
-            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"
-          />
-          <feBlend
-            mode="normal"
-            in2="BackgroundImageFix"
-            result="effect1_dropShadow_12_48"
-          />
-          <feBlend
-            mode="normal"
-            in="SourceGraphic"
-            in2="effect1_dropShadow_12_48"
-            result="shape"
-          />
-        </filter>
-      </defs>
-    </svg>
-  );
-});
+import { useState } from "react";
+import { FiRefreshCw } from "react-icons/fi";
 
 function App() {
   const [data, setData] = useState({ link: "", title: "" });
   const [showDetails, setShowDetails] = useState(false);
-  const [inputActive, setInputActive] = useState(false);
-  const [hoverActive, setHoverActive] = useState(false);
-
-  const logoRef = useRef<SVGSVGElement>(null);
-  const logoContainerRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
     if (data.link.trim()) {
       setShowDetails(true);
-      logoRef.current?.classList.add("glow-once");
-      setTimeout(() => logoRef.current?.classList.remove("glow-once"), 1000);
     }
   };
 
-  useEffect(() => {
-    const button = document.querySelector("#arrow-button");
-
-    setInputActive(data.link.trim() !== "");
-
-    const handleHoverIn = () => setHoverActive(true);
-    const handleHoverOut = () => setHoverActive(false);
-
-    button?.addEventListener("mouseenter", handleHoverIn);
-    button?.addEventListener("mouseleave", handleHoverOut);
-
-    return () => {
-      button?.removeEventListener("mouseenter", handleHoverIn);
-      button?.removeEventListener("mouseleave", handleHoverOut);
-    };
-  }, [data.link]);
-
   return (
-    <main className="min-h-dvh flex justify-center pb-16 pt-12 max-sm:px-8">
-      <form className="w-full max-w-xl flex flex-col items-center gap-8">
-        <div
-          className={`logo-container relative mb-4 
-            ${inputActive ? "input-active" : ""} 
-            ${hoverActive ? "hover-active" : ""}
-          `}
-          ref={logoContainerRef}
-        >
-          <Logo width="224px" className="hover-glow" ref={logoRef} />
-        </div>
+    <main
+      className="min-h-dvh grid place-items-center max-sm:pb-40 
+                max-sm:px-8 sm:pb-44 md:pb-48 lg:pb-56"
+    >
+      <div className="w-full max-w-xl flex flex-col items-center gap-8">
+        <img
+          className="w-56 hover-glow mb-5"
+          src="./icon.svg"
+          alt="Logo de MOPI"
+        />
 
-        <div className="flex gap-2 self-start">
-          <Logo width="40px" />
+        <div className="flex gap-2 self-start items-center">
+          <img className="w-8 hover-glow" src="./icon.svg" alt="Logo de MOPI" />
           <h3 className="text-base font-semibold tracking-wide">
             Tu Música, Gratis
           </h3>
         </div>
 
-        <div id="input_div" className="w-full">
+        <div className="input_div">
           <label htmlFor="link">Link</label>
           <div className="flex gap-1.5">
             <input
               id="link"
+              name="link"
               placeholder="https://www.youtube.com/..."
               value={data.link}
               onChange={(e) => setData({ ...data, link: e.target.value })}
               className="flex-grow"
             />
             <button
-              id="arrow-button"
               type="button"
               onClick={handleNext}
               className="px-3 grid place-items-center"
             >
-              <FiArrowRight className="size-5" />
+              <FiRefreshCw className="size-4" />
             </button>
           </div>
         </div>
 
         {showDetails && (
-          <div className="w-full animate-fade-in flex flex-col gap-6">
-            <div id="input_div">
-              <label htmlFor="title">Título</label>
-              <input
-                id="title"
-                placeholder="Lipps Inc. - Funkytown"
-                value={data.title}
-                onChange={(e) => setData({ ...data, title: e.target.value })}
-              />
-            </div>
+          <div className="w-full relative">
+            <div className="w-full flex flex-col gap-8 animate-fade-in absolute">
+              <div className="input_div">
+                <label htmlFor="title">Título</label>
+                <input
+                  id="title"
+                  name="title"
+                  placeholder="Lipps Inc. - Funkytown"
+                  value={data.title}
+                  onChange={(e) => setData({ ...data, title: e.target.value })}
+                />
+              </div>
 
-            <button
-              type="submit"
-              className="w-full mt-0.5 py-2 rounded-md border-none outline-none bg-white transition"
-            >
-              Descargar
-            </button>
+              <button type="submit" className="w-full mt-2 py-2 transition">
+                Descargar
+              </button>
+            </div>
           </div>
         )}
-      </form>
+      </div>
     </main>
   );
 }
