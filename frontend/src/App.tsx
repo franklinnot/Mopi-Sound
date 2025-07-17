@@ -1,21 +1,27 @@
-import { useState } from "react";
+import { useRef, useState, forwardRef } from "react";
 import { FiArrowRight } from "react-icons/fi";
 
-function Logo({ width = "100%", height = "auto" }) {
+const Logo = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(function Logo(
+  { width = "100%", height = "auto", className, ...props },
+  ref
+) {
   return (
     <svg
+      ref={ref}
       width={width}
       height={height}
       viewBox="0 0 1088 686"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      {...props}
     >
       <g filter="url(#filter0_d_12_48)">
         <path
           d="M1084 645.697C1084 418.695 752.442 191.692 543.999 191.692C335.557 191.692 4 413.65 4 645.697C4 852.335 335.557 2.00264e-05 543.999 2.00264e-05C752.442 2.00264e-05 1084 852.335 1084 645.697Z"
           fill="#FAFAFA"
           className="mix-blend-mode:hard-light"
-          shape-rendering="geometricPrecision"
+          shapeRendering="geometricPrecision"
         />
       </g>
       <defs>
@@ -26,9 +32,9 @@ function Logo({ width = "100%", height = "auto" }) {
           width="1088"
           height="686"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -57,20 +63,35 @@ function Logo({ width = "100%", height = "auto" }) {
       </defs>
     </svg>
   );
-}
+});
 
 function App() {
   const [data, setData] = useState({
     link: "",
     title: "",
   });
+  const [showDetails, setShowDetails] = useState(false);
+  const logoRef = useRef<SVGSVGElement>(null);
+
+  const handleNext = () => {
+    if (data.link.trim()) {
+      setShowDetails(true);
+
+      if (logoRef.current) {
+        logoRef.current.classList.add("glow-once");
+        setTimeout(() => {
+          logoRef.current?.classList.remove("glow-once");
+        }, 1000);
+      }
+    }
+  };
 
   return (
-    <main className="min-h-dvh grid place-items-center pb-16 max-sm:px-8">
+    <main className="min-h-dvh flex justify-center pb-16 pt-12 max-sm:px-8">
       <form className="w-full max-w-xl flex flex-col items-center gap-8">
         {/* Logo */}
-        <div className="mb-6">
-          <Logo width="224px" />
+        <div className="mb-4">
+          <Logo width="224px" className="hover-glow" ref={logoRef} />
         </div>
 
         {/* Título */}
@@ -82,7 +103,7 @@ function App() {
         </div>
 
         {/* Input: Link */}
-        <div id="input_div">
+        <div id="input_div" className="w-full">
           <label htmlFor="link">Link</label>
           <div className="flex gap-1.5">
             <input
@@ -92,32 +113,39 @@ function App() {
               onChange={(e) => setData({ ...data, link: e.target.value })}
               className="flex-grow"
             />
-            <button type="button" className="px-3 grid place-items-center">
+            <button
+              type="button"
+              onClick={handleNext}
+              className="px-3 grid place-items-center"
+            >
               <FiArrowRight className="size-5" />
             </button>
           </div>
         </div>
 
-        {/* Input: Título */}
-        <div id="input_div">
-          <label htmlFor="title">Título</label>
-          <input
-            id="title"
-            placeholder="Lipps Inc. - Funkytown"
-            value={data.title}
-            onChange={(e) => setData({ ...data, title: e.target.value })}
-            className="w-full"
-          />
-        </div>
+        {showDetails && (
+          <div className="w-full animate-fade-in flex flex-col gap-6">
+            {/* Input: Titulo */}
+            <div id="input_div">
+              <label htmlFor="title">Título</label>
+              <input
+                id="title"
+                placeholder="Lipps Inc. - Funkytown"
+                value={data.title}
+                onChange={(e) => setData({ ...data, title: e.target.value })}
+              />
+            </div>
 
-        {/* Botón final */}
-        <button
-          type="submit"
-          className="w-full mt-0.5 py-2 rounded-md border-none
-                    outline-none bg-white transition"
-        >
-          Descargar
-        </button>
+            <button
+              type="submit"
+              className="w-full mt-0.5 py-2 rounded-md border-none
+                 outline-none bg-white transition"
+            >
+              Descargar
+            </button>
+          </div>
+        )}
+
       </form>
     </main>
   );
