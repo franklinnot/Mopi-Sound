@@ -1,45 +1,33 @@
-# main.py
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse
-from .worker import get_file
-from .classes import Video
-import os
-import shutil
+from .audio.audio_request import AudioRequest
+from .audio.audio_response import AudioResponse
+from .audio.audio_download import AudioDownload
 
 app = FastAPI()
 
 
-@app.post("/download/")
-async def download(video: Video):
-    result = await get_file(video.url)
+@app.post("/download-audio/")
+async def download(audio_request: AudioRequest):
+    audio_download = AudioDownload(**audio_request.model_dump())
+    result: AudioResponse = await audio_download.extract()
 
-    if not result.error:
-        file_path = result.file_path
-        title = result.title
+    if result.error:
+        return JSONResponse(status_code=406, content={"message": result.message})
 
-        # funcion de limpieza
-        async def cleanup():
-            folder_path = os.path.dirname(file_path)
-            if os.path.exists(folder_path):
-                shutil.rmtree(folder_path)
+    # agregar tarea de limpieza al background
+    background_tasks = BackgroundTasks()
+    background_tasks.add_task(audio_download.cleanup)
 
-        # funcin de limpieza en bg
-        background_tasks = BackgroundTasks()
-        background_tasks.add_task(cleanup)
+    response = FileResponse(
+        path=audio_download.file_path,
+        media_type="audio/mpeg",
+        filename=f"{result.title}.mp3",
+        headers={
+            "title": result.title if result.title else "",
+            "message": result.message if result.message else "",
+        },
+        background=background_tasks,
+    )
 
-        response = FileResponse(
-            path=file_path,
-            media_type="audio/mpeg",  # tipo MIME
-            filename=f"{title}.mp3",  # nombre del archivo
-            headers={"X-Video-Title": title},
-            background=background_tasks,
-        )
-
-        return response
-    else:
-        return JSONResponse(
-            status_code=400,
-            content={
-                "message": result.message,
-            },
-        )
+    return response

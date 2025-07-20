@@ -27,7 +27,7 @@ Esta documentación te enseña cómo levantar el servicio backend de Mopi, utili
 
     > El comando `-v` (volume) mapea tu directorio de trabajo actual (`$(pwd)` o `%cd%`) al directorio `/code` dentro del contenedor. El servidor `fastapi dev` detectará automáticamente los cambios en este volumen.
 
-    > **Acceso:** El servicio será accesible en `http://localhost:8000`. La documentación de la API estará en `http://localhost:8000/docs`.
+    > **Acceso:** El servicio será accesible en [http://localhost:8000](http://localhost:8000). La documentación de la API estará en [http://localhost:8000/docs](http://localhost:8000/docs).
 
 ### Al Realizar Cambios en el `Dockerfile` o `requirements.txt`
 
@@ -145,7 +145,7 @@ Esta sección te guía para configurar y ejecutar el proyecto directamente en tu
     ```bash
     fastapi dev app/main.py
     ```
-    > El servidor estará disponible, por defecto, en `http://127.0.0.1:8000`. Puedes acceder a la documentación interactiva en `http://127.0.0.1:8000/docs`.
+    > El servidor estará disponible, por defecto, en [http://127.0.0.1:8000](http://127.0.0.1:8000). Puedes acceder a la documentación interactiva en [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
 ### Al Realizar Cambios en las Dependencias
 
