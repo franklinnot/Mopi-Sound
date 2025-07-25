@@ -21,6 +21,7 @@ class AudioDownload(AudioRequest):
             "no_warnings": True,
             "simulate": True,  # simular descarga
             "force_generic_extractor": True,  # metadatos generales
+            "ie_key": "Generic"
         }
 
     def get_down_opts(self, outtmpl: str) -> dict:
@@ -109,6 +110,11 @@ class AudioDownload(AudioRequest):
         if audio_response.error:
             return audio_response
 
+        audio_response = self.verify_title()
+
+        if audio_response.error:
+                    return audio_response
+
         await self.verify_duration()
 
         if not self.error:
@@ -116,7 +122,7 @@ class AudioDownload(AudioRequest):
             if not self.error:
                 await self.download_dlp()
                 if not self.error:
-                    audio_response.title = self.file_name
+                    audio_response.title = self.title if self.title else self.file_name
                 else:
                     await self.cleanup()
             else:

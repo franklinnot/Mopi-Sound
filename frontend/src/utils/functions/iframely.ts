@@ -15,7 +15,7 @@ export default async function getFramelyUrl(
         /src="(https:\/\/w\.soundcloud\.com\/player\/[^"]+)"/
       );
       if (match && match[1]) {
-        return match[1];
+        return match[1] + "&show_comments=false";
       }
     }
     return null;

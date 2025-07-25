@@ -1,11 +1,24 @@
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from .audio.audio_request import AudioRequest
 from .audio.audio_response import AudioResponse
 from .audio.audio_download import AudioDownload
 
-app = FastAPI()
+app = FastAPI(title="Mopi-Sound", description="")
 
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["POST"],
+    allow_headers=["*"],
+    expose_headers=["Content-Disposition"]
+)
 
 @app.post("/download-audio/")
 async def download(audio_request: AudioRequest):
@@ -22,9 +35,8 @@ async def download(audio_request: AudioRequest):
     response = FileResponse(
         path=audio_download.file_path,
         media_type="audio/mpeg",
-        filename=f"{result.title}.mp3",
+        filename=f"{result.title}",
         headers={
-            "title": result.title if result.title else "",
             "message": result.message if result.message else "",
         },
         background=background_tasks,

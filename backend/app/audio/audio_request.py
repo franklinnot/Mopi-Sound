@@ -1,12 +1,14 @@
 from pydantic import BaseModel
-from .quality import Quality
+from typing import Literal
 from .audio_response import AudioResponse
 from urllib.parse import urlparse
+import re
 
 
 class AudioRequest(BaseModel):
     url: str
-    quality: Quality = Quality.MEDIUM
+    title: str | None = None
+    quality: Literal["128" , "192" ,"256"] = "192"
 
     def verify_domain(self) -> AudioResponse:
         domains = [
@@ -35,3 +37,18 @@ class AudioRequest(BaseModel):
                     "Solo se permiten enlaces de YouTube y SoundCloud."
                 )
             return audio_response
+
+    def verify_title(self) -> AudioResponse:
+        audio_response = AudioResponse()
+        invalid_chars = r'[<>:"/\\|?*\n\r\t]'
+
+        if self.title is None or self.title.strip() == "":
+            return audio_response
+        elif re.search(invalid_chars, self.title):
+            audio_response.error = True
+            audio_response.message = "El título contiene caracteres no permitidos."
+        elif len(self.title) > 48:
+            audio_response.error = True
+            audio_response.message = "El título es demasiado largo."
+
+        return audio_response
